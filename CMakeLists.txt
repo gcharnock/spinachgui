@@ -46,8 +46,13 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-string
 
 find_package(wxWidgets COMPONENTS gl adv aui html REQUIRED)
 #find_package(Boost REQUIRED system program_options filesystem unit_test_framework) 
-set(Boost_INCLUDE_DIRS ~/src/boost_1_52_0)
-set(Boost_LIBRARIES -L~/src/boost_1_52_0/stage/lib -lboost_system -lboost_program_options -lboost_unit_test_framework -lboost_filesystem)
+
+#Prefix of boost builds known to work
+set(Boost_version "-gcc46-mt-1_52")
+set(Boost_dir     "$ENV{HOME}/src/boost_1_52_0")
+
+set(Boost_INCLUDE_DIRS ${Boost_dir})
+set(Boost_LIBRARIES "-L${Boost_dir}/stage/lib/" -lboost_system${Boost_version} -lboost_program_options${Boost_version} -lboost_unit_test_framework${Boost_version} -lboost_filesystem${Boost_version})
 
 ############################################################
 #List of source files for all the targets
@@ -126,19 +131,19 @@ add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
-target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+target_link_libraries(SpinachGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
 # Easyspin standalone app here
 
 add_executable(EasySpinGUI ${easyspinSources})
-target_link_libraries(EasySpinGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
+target_link_libraries(EasySpinGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
 
 ############################################################
 # Orient Dialog Standalone
 
 add_executable(OrientDialog ${orientDialogSources})
-target_link_libraries(OrientDialog ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
+target_link_libraries(OrientDialog spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
 
 ############################################################
 # Tests specified here
