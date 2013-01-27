@@ -9,7 +9,7 @@ enable_testing()
 
 ############################################################
 #Tell me what commands are being executed.
-# set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
@@ -45,9 +45,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-string
 # Do automatic library detection
 
 find_package(wxWidgets COMPONENTS gl adv aui html REQUIRED)
-find_package(Boost REQUIRED program_options filesystem unit_test_framework) 
-#set(Boost_INCLUDE_DIRS /usr/shared/include)
-set(Boost_LIBRARIES  -lboost_program_options -lboost_unit_test_framework -lboost_filesystem)
+#find_package(Boost REQUIRED system program_options filesystem unit_test_framework) 
+set(Boost_INCLUDE_DIRS ~/src/boost_1_52_0)
+set(Boost_LIBRARIES -L~/src/boost_1_52_0/stage/lib -lboost_system -lboost_program_options -lboost_unit_test_framework -lboost_filesystem)
 
 ############################################################
 #List of source files for all the targets
@@ -132,13 +132,13 @@ target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidget
 # Easyspin standalone app here
 
 add_executable(EasySpinGUI ${easyspinSources})
-target_link_libraries(EasySpinGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+target_link_libraries(EasySpinGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
 
 ############################################################
 # Orient Dialog Standalone
 
 add_executable(OrientDialog ${orientDialogSources})
-target_link_libraries(OrientDialog ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+target_link_libraries(OrientDialog ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
 
 ############################################################
 # Tests specified here
