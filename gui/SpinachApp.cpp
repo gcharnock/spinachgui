@@ -262,7 +262,7 @@ bool SpinachApp::OnInit() {
         TRACE("Loading Isotopes");
         LoadIsotopes();
     } catch(runtime_error e) {
-        ERROR("Failed to loaded isotopes");
+        _ERROR_("Failed to loaded isotopes");
         cout << "Isotopes not loaded" << endl;
         wxLogError(wxString() <<
                    wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") <<

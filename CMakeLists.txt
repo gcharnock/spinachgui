@@ -9,7 +9,7 @@ enable_testing()
 
 ############################################################
 #Tell me what commands are being executed.
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
@@ -131,7 +131,7 @@ add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
-target_link_libraries(SpinachGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+target_link_libraries(SpinachGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
 
 ############################################################
 # Easyspin standalone app here
