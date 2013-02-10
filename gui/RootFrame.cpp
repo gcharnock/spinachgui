@@ -17,6 +17,7 @@
 #include <wx/statusbr.h>
 #include <wx/treectrl.h>
 #include <wx/aui/aui.h>
+#include <wx/msgdlg.h>
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
 
@@ -520,7 +521,7 @@ void RootFrame::SaveAs() {
 
 void RootFrame::OnExit(wxCommandEvent& e) {
     TRACE("RootFrame::OnExit");
-    delete this;
+    this->Close();
     TRACE("Done RootFrame::OnExit");
 }
 
@@ -669,6 +670,11 @@ void RootFrame::OnExportToEasyspin(wxCommandEvent& e) {
     mEasySpin->Show();
 }
 
+void RootFrame::OnClose(wxCloseEvent& e) {
+  wxMessageDialog dlg(this,wxT("Really Exit?"),wxT("Really Exit?"),wxOK | wxCANCEL);
+  e.Skip(dlg.ShowModal() == wxID_OK);
+}
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
 EVT_MENU_OPEN(RootFrame::OnMenu)
@@ -710,6 +716,8 @@ EVT_MENU(ID_ELLIPSOIDS,      RootFrame::OnEllipsoid)
 EVT_SIZE(RootFrame::OnResize)
 
 EVT_ERASE_BACKGROUND(RootFrame::OnEraseBackground)
+
+EVT_CLOSE(RootFrame::OnClose)
 
 END_EVENT_TABLE()
 

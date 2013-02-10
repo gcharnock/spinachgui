@@ -79,7 +79,7 @@ public:
     //Resize Event
     void OnResize(wxSizeEvent& e);
 
-
+    void OnClose(wxCloseEvent& e);
 
     //Unit Menu
     void OnUnitChange(wxCommandEvent& e);
