@@ -25,13 +25,13 @@ namespace SpinXML {
         static sigc::signal<void> sigAnyChange;
     private:
         void relayToAnyChange() {
-            sigAnyChange();
+	    sigAnyChange();
         }
         Frame* mFrame;
     };
 
     template<typename Derived>
-    sigc::signal<void> SpinXMLBase<Derived>::sigAnyChange;
+        sigc::signal<void> SpinXMLBase<Derived>::sigAnyChange;
 };
 
 #endif

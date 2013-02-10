@@ -84,6 +84,8 @@ public:
     //Unit Menu
     void OnUnitChange(wxCommandEvent& e);
 
+    void SlotAnyChange() {mNeedsSave=true;UpdateTitle();}
+
     DECLARE_EVENT_TABLE();
 
 private:
@@ -106,6 +108,8 @@ private:
     wxString mOpenDir;
     ///Just the name of the open file
     wxString mOpenFile;
+
+    bool mNeedsSave;
 
     std::vector<unit> mIdToUnit;
 
