@@ -10,7 +10,6 @@
 #include <shared/formats/xyz.hpp>
 #include <shared/formats/g03.hpp>
 #include <shared/formats/xml.hpp>
-#include <shared/formats/castep.hpp>
 #include <shared/formats/simpson.hpp>
 #include <shared/formats/easyspin.hpp>
 
@@ -135,7 +134,6 @@ ISpinSystemLoader* GetLoaderFromExtension(const string& ext) {
 
 G03Loader      gG03Loader;	   
 SIMPSONLoader  gSIMPSONLoader; 
-CASTEPLoader   gCASTEPLoader;  
 EasySpinLoader gEasySpinLoader;
 XMLLoader      gXMLLoader;
 XYZLoader      gXYZLoader;
