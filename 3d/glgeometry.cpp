@@ -328,8 +328,6 @@ void ElectronInterDrawer::Geometary() const {
 
 
     }
-    cout << endl;
-        
 }
 
 //============================================================//

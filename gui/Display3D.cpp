@@ -246,7 +246,6 @@ void Display3D::StopPicking() {
             closestNameCount=name_count;
         }
         buff+=name_count;
-        cout << endl;
     }
     OnMouseOver3D(closestNameCount,closestNames);
 }
