@@ -2,7 +2,7 @@
 #include <gui/EasySpinFrame.hpp>
 #include <wx/valtext.h>
 
-#include <gui/OrientationEdit.hpp>
+#include <gui/OrientDialog2.hpp>
 #include <gui/TextCtrlFocus.hpp>
 #include <fstream>
 #include <vector>
@@ -495,7 +495,7 @@ void EasySpinFrame::OnOrientDClick(wxListEvent& e) {
         //Not sure if this can actually happen
         return;
     }
-    OrientEditDialog* orientDialog = new OrientEditDialog(this);
+    OrientDialog2* orientDialog = new OrientDialog2(this);
     orientDialog->SetOrient(mOrients[itemIndex]);
     if (orientDialog->ShowModal() == wxID_OK) {
         mOrients[itemIndex] = orientDialog->GetOrient();

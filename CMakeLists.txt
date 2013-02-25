@@ -96,9 +96,10 @@ set(wxformbuilderSources
 set(easyspinSources   #For the standalone easyspin version
   ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/auto/easyspin.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/auto/orientdialog.cpp
   gui/EasySpinFrame.cpp
   gui/TextBitmap.cpp
-  gui/OrientationEdit.cpp
+  gui/OrientDialog2.cpp
   gui/Spacegroup.cpp
   gui/OrientDisplay.cpp
   gui/TextCtrlFocus.cpp

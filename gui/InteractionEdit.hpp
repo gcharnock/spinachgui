@@ -2,7 +2,7 @@
 #ifndef INTEREDIT_H
 #define INTEREDIT_H
 
-#include <gui/OrientationEdit.hpp>
+#include <gui/OrientDialog2.hpp>
 
 #include <auto/SpinachGUI.h>
 #include <shared/spinsys.hpp>

@@ -2,11 +2,17 @@
 #ifndef __ORIENT_DIALOG_2__H__
 #define __ORIENT_DIALOG_2__H__
 
+#include <shared/orientation.hpp>
+#include <auto/SpinachGUI.h>
 #include <auto/orientdialog.h>
 #include <vector>
 #include <boost/optional.hpp>
 
 typedef boost::optional<SpinXML::Orientation::Type> maybeOrientType;
+
+
+//============================================================//
+// OrientDialogCombo
 
 class OrientDialog2 : public OrientDialog2Base {
 public:
@@ -16,6 +22,13 @@ public:
     
     //Other
     void SetOrient(const SpinXML::Orientation& orient,maybeOrientType typeToKeep = maybeOrientType());
+    SpinXML::Orientation GetOrient() const;
+
+    SpinXML::EulerAngles ReadEulerEdit() const;
+    Eigen::AngleAxisd  ReadAngleAxisEdit() const;
+    Eigen::Quaterniond ReadQuaternionEdit() const;
+    Eigen::Matrix3d    ReadDCMEdit() const;
+
 
 protected:
     DECLARE_EVENT_TABLE();
@@ -27,11 +40,38 @@ protected:
 
     //Non Evetns
     void UpdateDet();
+    void SetLastEdited(SpinXML::Orientation::Type type);
 private:
+    SpinXML::Orientation::Type mLastTypeEdited;
+
     std::vector<TextCtrlFocus*> mEulerAngleCtrls;
     std::vector<TextCtrlFocus*> mMatrixCtrls;
     std::vector<TextCtrlFocus*> mAngleAxisCtrls;
     std::vector<TextCtrlFocus*> mQuaternionCtrls;
+};
+
+
+//============================================================//
+// OrientDialogCombo
+
+class OrientDialogCombo : public wxButton {
+public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    OrientDialogCombo(wxWindow* parent,wxWindowID id=-1);
+
+    void SetOrient(const SpinXML::Orientation& orient);
+    const SpinXML::Orientation& GetOrient() {return mOrient;}
+    
+    //Events
+    void OnClick(wxCommandEvent& e);
+
+    sigc::signal<void> sigChange;
+protected:
+    void ReadFromOrient();
+    DECLARE_EVENT_TABLE();
+
+private:
+    SpinXML::Orientation mOrient;
 };
 
 #endif
