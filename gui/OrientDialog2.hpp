@@ -29,6 +29,11 @@ public:
     Eigen::Quaterniond ReadQuaternionEdit() const;
     Eigen::Matrix3d    ReadDCMEdit() const;
 
+    void WriteEulerEdit(     const SpinXML::EulerAngles& ea);
+    void WriteAngleAxisEdit( const Eigen::AngleAxisd& aa);
+    void WriteQuaternionEdit(const Eigen::Quaterniond& q);
+    void WriteDCMEdit(       const Eigen::Matrix3d& mat);
+
 
 protected:
     DECLARE_EVENT_TABLE();
@@ -38,8 +43,15 @@ protected:
     void OnDCMEdit(wxCommandEvent& e);
     void OnIdentity(wxCommandEvent& e);
 
+    void OnFixMat(wxCommandEvent& e);
+    void OnFixQuat(wxCommandEvent& e);
+    void OnFixAA(wxCommandEvent& e);
+
     //Non Evetns
+    void Update3D(const Eigen::Matrix3d& mat);
     void UpdateDet();
+    void UpdateQNorm();
+    void UpdateAANorm();
     void SetLastEdited(SpinXML::Orientation::Type type);
 private:
     SpinXML::Orientation::Type mLastTypeEdited;

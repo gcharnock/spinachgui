@@ -7,6 +7,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <Eigen/Dense>
+#include <Eigen/QR>
 #include <shared/panic.hpp>
 
 using namespace std;
@@ -73,9 +74,30 @@ AngleAxisd  SpinXML::ConvertToAngleAxis(const AngleAxisd&   rot) {return rot;}
 
 //============================================================//
 // Rotation Normalizer bank
-EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Normalized();}                                                          
-Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {return rot;}
-Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}                                                          
+EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Normalized();}
+Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
+    //There are severnal methods to fixing up a rotaiton matrix, here
+    //we will use a QR factorisation.
+
+    HouseholderQR<Matrix3d> QRSolver = rot.householderQr();
+    Matrix3d QR = QRSolver.matrixQR();
+
+    //The resulting matrix is formated so R is the upper triangle, and
+    //the rest of the matrix is Q. We can recover the full Q using the
+    //fact that the rows and columbs form othogonal vectors
+
+    //The Elements we need to find are (0,1), (0,2) and (1,2)
+    cout << QR << endl;
+    QR(0,1) = 1-sqrt(QR(1,1)*QR(1,1) + QR(2,1)*QR(2,1));
+    cout << QR << endl;
+    QR(0,2) = 1-sqrt(QR(0,0)*QR(0,0) + QR(0,1)*QR(0,1));
+    cout << QR << endl;
+    QR(1,2) = 1-sqrt(QR(1,0)*QR(1,0) + QR(1,1)*QR(1,1));
+    cout << QR << endl;
+
+    return QR;
+}
+Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}
 AngleAxisd  SpinXML::NormalizeRotation(const AngleAxisd& rot)  {return AngleAxisd(rot.angle(),rot.axis().normalized());}
 
 
