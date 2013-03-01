@@ -22,6 +22,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wno-write-strings -Wall
 
 SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS}")
 
+#set(lapack_libraries "-Bstatic --static $ENV{HOME}/src/CLAPACK-3.2.1/lapack_LINUX.a $ENV{HOME}/src/CLAPACK-3.2.1/blas_LINUX.a $ENV{HOME}/src/CLAPACK-3.2.1/F2CLIBS/libf2c.a -Bdynamic")
+
+set(lapack_libraries "-Bstatic $ENV{HOME}/src/CLAPACK-3.2.1/lapack_LINUX.a $ENV{HOME}/src/CLAPACK-3.2.1/blas_LINUX.a $ENV{HOME}/src/CLAPACK-3.2.1/F2CLIBS/libf2c.a -Bdynamic")
+
 #Choose a build type:
 
 #Default build. The worst of both worlds
@@ -146,6 +150,9 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 include_directories(SYSTEM /usr/include/sigc++-2.0)
 include_directories(SYSTEM /usr/lib/sigc++-2.0/include/)
 include_directories(SYSTEM $ENV{HOME}/src/eigen-3.1.2/)
+include_directories(SYSTEM $ENV{HOME}/src/CLAPACK-3.2.1/INCLUDE/)
+
+
 
 ############################################################
 # Link the non graphical code into a library
@@ -156,19 +163,19 @@ add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
-target_link_libraries(SpinachGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
+target_link_libraries(SpinachGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU ${lapack_libraries})
 
 ############################################################
 # Easyspin standalone app here
 
 add_executable(EasySpinGUI ${easyspinSources})
-target_link_libraries(EasySpinGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
+target_link_libraries(EasySpinGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU ${lapack_libraries})
 
 ############################################################
 # Orient Dialog Standalone
 
 add_executable(OrientDialog ${orientDialogSources})
-target_link_libraries(OrientDialog spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU)
+target_link_libraries(OrientDialog spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU ${lapack_libraries})
 
 ############################################################
 # Tests specified here
