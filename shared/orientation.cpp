@@ -7,7 +7,6 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <Eigen/Dense>
-#include <Eigen/QR>
 #include <shared/panic.hpp>
 #include <alloca.h>
 
@@ -88,18 +87,18 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
     //There are severnal methods to fixing up a rotaiton matrix, here
     //we will use a QR factorisation.
 
-    HouseholderQR<Matrix3d> QRSolver = rot.householderQr();
-    Matrix3d QR = QRSolver.matrixQR();
     Matrix3d Q;
-    Matrix3d R;
+    //Matrix3d R;
 
-    cout << "rot=" << endl;
-    cout << rot << endl;
-    cout << endl;
+    /*
+      cout << "rot=" << endl;
+      cout << rot << endl;
+      cout << endl;
 
-    cout << "QR=" << endl;
-    cout << QR << endl;
-    cout << endl;
+      cout << "QR=" << endl;
+      cout << QR << endl;
+      cout << endl;
+    */
 
     //Lapack call
 
@@ -127,11 +126,13 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
     A[7] = rot(1,2);
     A[8] = rot(2,2);
 
+    /*
     cout << "A in = " << endl;
     cout << A[0] << "\t" << A[3] << "\t" << A[6] << endl;
     cout << A[1] << "\t" << A[4] << "\t" << A[7] << endl;
     cout << A[2] << "\t" << A[5] << "\t" << A[8] << endl;
     cout << endl;
+    */
 
     dgeqrf_(
             &m,&n,
@@ -142,7 +143,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
             &lworkspace,
             &info
             );
-
+    /*
     cout << "A out = " << endl;
     cout << A[0] << "\t" << A[3] << "\t" << A[6] << endl;
     cout << A[1] << "\t" << A[4] << "\t" << A[7] << endl;
@@ -150,7 +151,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
 
     cout << "info = " << info << endl;
     cout << endl;
-
+    */
     R(0,0) = A[0];
     R(1,0) = 0;
     R(2,0) = 0;
@@ -173,7 +174,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
             &lworkspace,
             &info      //Zero if sucesful
             );
-
+    /*
     cout << "A out = " << endl;
     cout << A[0] << "\t" << A[1] << "\t" << A[2] << endl;
     cout << A[3] << "\t" << A[4] << "\t" << A[5] << endl;
@@ -181,6 +182,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
 
     cout << "info = " << info << endl;
     cout << endl;
+    */
 
     Q(0,0) = A[0];
     Q(1,0) = A[1];
@@ -194,6 +196,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
     Q(1,2) = A[7];
     Q(2,2) = A[8];
 
+    /*
     cout << "Q = " << endl;
     cout << Q << endl;
     cout << endl;
@@ -205,7 +208,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
     cout << "QR = " << endl;
     cout << (Q*R) << endl;
     cout << endl;
-
+    */
     return Q;
 }
 Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}
