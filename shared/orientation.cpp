@@ -152,7 +152,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
     cout << "info = " << info << endl;
     cout << endl;
     */
-    R(0,0) = A[0];
+    /*R(0,0) = A[0];
     R(1,0) = 0;
     R(2,0) = 0;
             
@@ -162,7 +162,7 @@ Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
             
     R(0,2) = A[6];
     R(1,2) = A[7];
-    R(2,2) = A[8];
+    R(2,2) = A[8];*/
 
     dorgqr_(
             &m,&n, //Row and column count
