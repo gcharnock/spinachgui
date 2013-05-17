@@ -17,6 +17,7 @@
 #include <wx/statusbr.h>
 #include <wx/treectrl.h>
 #include <wx/aui/aui.h>
+#include <wx/msgdlg.h>
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
 
@@ -260,6 +261,11 @@ void RootFrame::InitFrame() {
 
     mSpinInterEdit->GetInterEdit()->sigInterSet.connect(sigc::mem_fun(statusBar,&StatusBar::SlotInterFocusChange));
 
+    //Subscribe to all change events.
+    SpinSystem::sigAnyChange.connect( mem_fun(this,&RootFrame::SlotAnyChange));
+    Spin::sigAnyChange.connect(       mem_fun(this,&RootFrame::SlotAnyChange));
+    Interaction::sigAnyChange.connect(mem_fun(this,&RootFrame::SlotAnyChange));
+
     //Units menu. To avoid writing an On* function for every unit
     //(which would make making units configurable impossible) we
     //connect them all to the same handler and setup a lookup for
@@ -282,6 +288,8 @@ void RootFrame::InitFrame() {
     //Setup the easyspin exporter
     mEasySpin = new EasySpinFrame(this);
     TRACE("Finished RootFrame::InitFrame");
+
+    mNeedsSave = false;
 }
 
 void RootFrame::OnElementSelect(wxCommandEvent& e) {
@@ -325,7 +333,12 @@ void RootFrame::OnUnSupress(wxCommandEvent& e) {
 
 
 void RootFrame::UpdateTitle() {
-    SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
+    SetTitle(wxString()
+	     << (mNeedsSave ? wxT("*") : wxT(""))
+	     << mOpenFile
+	     << wxT(" - Spinach (")
+	     << mOpenPath
+	     << wxT(")"));
 }
 
 void RootFrame::OnOpen(wxCommandEvent& e) {
@@ -449,6 +462,8 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
 
         }
     }
+    mNeedsSave = false;
+
     SetFrame(GetRawSS()->GetLabFrame());
     Chkpoint(wxT("Load File"));
     UpdateTitle();
@@ -513,6 +528,7 @@ void RootFrame::SaveAs() {
         } else {
             GetRawSS()->SaveToFile(mOpenPath.char_str(),saver);
         }
+	mNeedsSave = false;
         UpdateTitle();
     }
     TRACE("done RootFrame::OnSave");
@@ -520,7 +536,7 @@ void RootFrame::SaveAs() {
 
 void RootFrame::OnExit(wxCommandEvent& e) {
     TRACE("RootFrame::OnExit");
-    delete this;
+    this->Close();
     TRACE("Done RootFrame::OnExit");
 }
 
@@ -669,6 +685,15 @@ void RootFrame::OnExportToEasyspin(wxCommandEvent& e) {
     mEasySpin->Show();
 }
 
+void RootFrame::OnClose(wxCloseEvent& e) {
+    if(mNeedsSave) {
+        wxMessageDialog dlg(this,wxT("Really Exit?"),wxT("Really Exit?"),wxOK | wxCANCEL);
+        e.Skip(dlg.ShowModal() == wxID_OK);
+    } else {
+        e.Skip(true);
+    }
+}
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
 EVT_MENU_OPEN(RootFrame::OnMenu)
@@ -710,6 +735,8 @@ EVT_MENU(ID_ELLIPSOIDS,      RootFrame::OnEllipsoid)
 EVT_SIZE(RootFrame::OnResize)
 
 EVT_ERASE_BACKGROUND(RootFrame::OnEraseBackground)
+
+EVT_CLOSE(RootFrame::OnClose)
 
 END_EVENT_TABLE()
 

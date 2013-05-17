@@ -8,6 +8,15 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <Eigen/Dense>
 #include <shared/panic.hpp>
+#include <alloca.h>
+
+namespace lapack {
+#include <f2c.h>
+#include <clapack.h>
+};
+
+using lapack::dorgqr_;
+using lapack::dgeqrf_;
 
 using namespace std;
 using namespace Eigen;
@@ -73,9 +82,136 @@ AngleAxisd  SpinXML::ConvertToAngleAxis(const AngleAxisd&   rot) {return rot;}
 
 //============================================================//
 // Rotation Normalizer bank
-EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Normalized();}                                                          
-Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {return rot;}
-Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}                                                          
+EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Normalized();}
+Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
+    //There are severnal methods to fixing up a rotaiton matrix, here
+    //we will use a QR factorisation.
+
+    Matrix3d Q;
+    //Matrix3d R;
+
+    /*
+      cout << "rot=" << endl;
+      cout << rot << endl;
+      cout << endl;
+
+      cout << "QR=" << endl;
+      cout << QR << endl;
+      cout << endl;
+    */
+
+    //Lapack call
+
+    lapack::integer info;
+
+    lapack::integer m = 3,n = 3;
+    lapack::integer k = 3;
+
+    lapack::integer LDA = 3;
+    double* A   = (double*)alloca(9*sizeof(double));
+    double* TAU = (double*)alloca(3*sizeof(double));
+
+    lapack::integer lworkspace = 30;
+    double* workspace = (double*)alloca(lworkspace*sizeof(double));
+
+    A[0] = rot(0,0);
+    A[1] = rot(1,0);
+    A[2] = rot(2,0);
+                 
+    A[3] = rot(0,1);
+    A[4] = rot(1,1);
+    A[5] = rot(2,1);
+                 
+    A[6] = rot(0,2);
+    A[7] = rot(1,2);
+    A[8] = rot(2,2);
+
+    /*
+    cout << "A in = " << endl;
+    cout << A[0] << "\t" << A[3] << "\t" << A[6] << endl;
+    cout << A[1] << "\t" << A[4] << "\t" << A[7] << endl;
+    cout << A[2] << "\t" << A[5] << "\t" << A[8] << endl;
+    cout << endl;
+    */
+
+    dgeqrf_(
+            &m,&n,
+            A,
+            &LDA,
+            TAU,
+            workspace,
+            &lworkspace,
+            &info
+            );
+    /*
+    cout << "A out = " << endl;
+    cout << A[0] << "\t" << A[3] << "\t" << A[6] << endl;
+    cout << A[1] << "\t" << A[4] << "\t" << A[7] << endl;
+    cout << A[2] << "\t" << A[5] << "\t" << A[8] << endl;
+
+    cout << "info = " << info << endl;
+    cout << endl;
+    */
+    /*R(0,0) = A[0];
+    R(1,0) = 0;
+    R(2,0) = 0;
+            
+    R(0,1) = A[3];
+    R(1,1) = A[4];
+    R(2,1) = 0;
+            
+    R(0,2) = A[6];
+    R(1,2) = A[7];
+    R(2,2) = A[8];*/
+
+    dorgqr_(
+            &m,&n, //Row and column count
+            &k,    //The number of elementary reflectors whose product defines the matrix Q. N >= K >= 0.
+            A,     //The array. Becomes Q on exit
+            &LDA,
+            TAU,
+            workspace,
+            &lworkspace,
+            &info      //Zero if sucesful
+            );
+    /*
+    cout << "A out = " << endl;
+    cout << A[0] << "\t" << A[1] << "\t" << A[2] << endl;
+    cout << A[3] << "\t" << A[4] << "\t" << A[5] << endl;
+    cout << A[6] << "\t" << A[7] << "\t" << A[8] << endl;
+
+    cout << "info = " << info << endl;
+    cout << endl;
+    */
+
+    Q(0,0) = A[0];
+    Q(1,0) = A[1];
+    Q(2,0) = A[2];
+             
+    Q(0,1) = A[3];
+    Q(1,1) = A[4];
+    Q(2,1) = A[5];
+             
+    Q(0,2) = A[6];
+    Q(1,2) = A[7];
+    Q(2,2) = A[8];
+
+    /*
+    cout << "Q = " << endl;
+    cout << Q << endl;
+    cout << endl;
+
+    cout << "R = " << endl;
+    cout << R << endl;
+    cout << endl;
+
+    cout << "QR = " << endl;
+    cout << (Q*R) << endl;
+    cout << endl;
+    */
+    return Q;
+}
+Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}
 AngleAxisd  SpinXML::NormalizeRotation(const AngleAxisd& rot)  {return AngleAxisd(rot.angle(),rot.axis().normalized());}
 
 

@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#define BOOST_FILESYSTEM_VERSION 2
+//#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
 
 using namespace std;
@@ -85,7 +85,7 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 
 	//The name of the matlab function is the name of the file
 	path filepath(filename);
-	string functionName = filepath.stem();
+	string functionName = filepath.stem().native();
 
 	fout << "function " << functionName << "()" << endl;
 
