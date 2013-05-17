@@ -362,7 +362,7 @@
                         <property name="help"></property>
                         <property name="id">ID_NMR_EPR</property>
                         <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">Set Mixed Mode</property>
+                        <property name="label">Set General Mode</property>
                         <property name="name">mMenuItemNmrEpr</property>
                         <property name="permission">protected</property>
                         <property name="shortcut"></property>
