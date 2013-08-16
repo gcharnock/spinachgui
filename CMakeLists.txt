@@ -9,13 +9,10 @@ enable_testing()
 
 ############################################################
 #Tell me what commands are being executed.
-#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
-
-#set(CMAKE_CXX_COMPILER "g++-4.5")
-#set(CMAKE_CXX_LINKER "g++-4.5")
 
 set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -DEIGEN_DONT_ALIGN")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wno-write-strings -Wall")
@@ -41,35 +38,43 @@ set(CMAKE_BUILD_TYPE Debug)
 #Work out where all the built files are going
 set(buildDir ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
 
-#GDB can debug an optermised executable. It's one of a very small
-#number of debuggers that can.
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-strings ")
+#GDB can debug an optermised executable.
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-strings ")
 
 ############################################################
 # Do automatic library detection
 
-#find_package(wxWidgets COMPONENTS gl adv aui html REQUIRED)
+find_package(wxWidgets COMPONENTS core gl adv aui html REQUIRED)
 #find_package(Boost REQUIRED system program_options filesystem unit_test_framework) 
 
-#Prefix of the wxWidgets build
-set(wxDir         	"$ENV{HOME}/src/wxWidgets-2.8.11")
-set(wxIncludeDirs 	"${wxDir}/include/" "${wxDir}/lib/wx/include/gtk2-unicode-release-static-2.8/")
-set(wxLibraryDirs 	"${wxDir}/lib")
-set(wxWidgets_LIBRARIES "-L${wxLibraryDirs}" #-Wl,-Bstatic
-  -lwx_gtk2u_gl-2.8
-  -lwx_gtk2u_aui-2.8
-  -lwx_gtk2u_html-2.8
-  -lwx_gtk2u_adv-2.8
-  -lwx_baseu-2.8
-  #-Wl,-Bdynamic
-)
+############################################################
+# Manual wxWidgets 
+
+# #Prefix of the wxWidgets build
+# set(wxDir         	"$ENV{HOME}/src/wxWidgets-2.8.12")
+# set(wxLibraryDirs 	"${wxDir}/lib")
+
+# #set(wxSetupHDir         "${wxDir}/lib/wx/include/gtk2-unicode-release-static-2.8/")
+# set(wxSetupHDir         "${wxDir}/lib/wx/include/gtk2-unicode-release-2.8")
+# set(wxSetupHDir         "${wxDir}/lib/wx/include/gtk2-unicode-release-static-2.8")
+
+# set(wxIncludeDirs 	"${wxDir}/include/" ${wxSetupHDir})
+
+# set(wxWidgets_LIBRARIES "-L${wxLibraryDirs}" #-Wl,-Bstatic
+#   -lwx_gtk2u_gl-2.8
+#   -lwx_gtk2u_aui-2.8
+#   -lwx_gtk2u_html-2.8
+#   -lwx_gtk2u_adv-2.8
+#   -lwx_baseu-2.8
+#   #-Wl,-Bdynamic
+# )
 
 
 #Prefix of boost builds known to work
 #set(Boost_version "-gcc46-mt-1_52")
 #set(Boost_dir     "$ENV{HOME}/src/boost_1_52_0")
 
-set(Boost_version "-gcc44-mt")
+set(Boost_version "-gcc46-mt")
 set(Boost_dir     "$ENV{HOME}/src/boost_1_46_1")
 
 set(Boost_INCLUDE_DIRS ${Boost_dir})
@@ -143,7 +148,8 @@ set(xmlSources
 # If you include via absolute paths, you can move source files about
 # more easily.
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(SYSTEM ${wxIncludeDirs})
+include_directories(SYSTEM ${wxWidgets_INCLUDE_DIRS})
+#include_directories(SYSTEM ${wxIncludeDirs}) #Manual configuration
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
@@ -163,19 +169,40 @@ add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
-target_link_libraries(SpinachGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU ${lapack_libraries})
+target_link_libraries(SpinachGUI
+  spinxml
+  ${Boost_LIBRARIES}
+  sigc-2.0
+  ${wxWidgets_LIBRARIES}
+  GL
+  GLU
+  ${lapack_libraries})
 
 ############################################################
 # Easyspin standalone app here
 
 add_executable(EasySpinGUI ${easyspinSources})
-target_link_libraries(EasySpinGUI spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU ${lapack_libraries})
+target_link_libraries(EasySpinGUI
+  spinxml
+  ${Boost_LIBRARIES}
+  sigc-2.0
+  ${wxWidgets_LIBRARIES}
+  GL
+  GLU
+  ${lapack_libraries})
 
 ############################################################
 # Orient Dialog Standalone
 
 add_executable(OrientDialog ${orientDialogSources})
-target_link_libraries(OrientDialog spinxml ${Boost_LIBRARIES} sigc-2.0  ${wxWidgets_LIBRARIES} GL GLU ${lapack_libraries})
+target_link_libraries(OrientDialog
+  spinxml
+  ${Boost_LIBRARIES}
+  sigc-2.0
+  ${wxWidgets_LIBRARIES}
+  GL
+  GLU
+  ${lapack_libraries})
 
 ############################################################
 # Tests specified here
