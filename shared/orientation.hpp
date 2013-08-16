@@ -163,7 +163,7 @@ namespace SpinXML {
         Eigen::AngleAxisd  GetAsAngleAxis() const;
         Eigen::Quaterniond GetAsQuaternion() const;
 
-    private:
+        //private:
 
 		Type mType;
 		EulerAngles mEuler;

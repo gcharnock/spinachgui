@@ -10,7 +10,10 @@
 #include <shared/orientation.hpp>
 #include <map>
 
+
 namespace SpinXML {
+    void printEVMMap_();
+
     ///============================================================//
     struct Eigenvalues {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

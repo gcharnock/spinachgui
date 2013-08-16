@@ -13,6 +13,23 @@ using namespace SpinXML;
 using namespace std;
 using namespace boost;
 
+void SpinXML::printEVMMap_() {
+    Eigenvalues ev(0,0,0,Orientation());
+    cout << "Absolute location: " << &ev << endl;
+    cout << endl;
+
+    cout << "&xx: " << -((char*)(&ev) - (char*)(&ev.xx)) << " sizeof=" << (sizeof(ev.xx)) << endl;
+    cout << "&yy: " << -((char*)(&ev) - (char*)(&ev.yy)) << " sizeof=" << (sizeof(ev.yy)) << endl;
+    cout << "&zz: " << -((char*)(&ev) - (char*)(&ev.zz)) << " sizeof=" << (sizeof(ev.zz)) << endl;
+    cout << "&mOrient: " << -((char*)(&ev) - (char*)(&ev.mOrient)) << " sizeof=" << (sizeof(ev.mOrient)) << endl;
+    cout << "  " << "&ev.mOrient.mType:"       << -((char*)(&ev) - (char*)(&ev.mOrient.mType)) << " sizeof=" << (sizeof(ev.mOrient.mType)) << endl;
+    cout << "  " << "&ev.mOrient.mEuler:"      << -((char*)(&ev) - (char*)(&ev.mOrient.mEuler)) << " sizeof=" << (sizeof(ev.mOrient.mEuler)) << endl;
+    cout << "  " << "&ev.mOrient.mAngleAxis:"  << -((char*)(&ev) - (char*)(&ev.mOrient.mAngleAxis)) << " sizeof=" << (sizeof(ev.mOrient.mAngleAxis)) << endl;
+    cout << "  " << "&ev.mOrient.mQuaternion:" << -((char*)(&ev) - (char*)(&ev.mOrient.mQuaternion)) << " sizeof=" << (sizeof(ev.mOrient.mQuaternion)) << endl;
+    cout << "  " << "&ev.mOrient.mMatrix:"     << -((char*)(&ev) - (char*)(&ev.mOrient.mMatrix)) << " sizeof=" << (sizeof(ev.mOrient.mMatrix)) << endl;
+}
+
+
 energy SpinXML::ConvertToScalar(const energy&   I)    {return I;}
 energy SpinXML::ConvertToScalar(const Matrix3d& I)    {return energy(I.trace()/3.0);}
 energy SpinXML::ConvertToScalar(const Eigenvalues& I) {return energy((I.xx+I.yy+I.zz)/3.0);}
@@ -46,7 +63,8 @@ Eigenvalues SpinXML::ConvertToEigenvalues(const Matrix3d& I) {
     double e1=real(solver.eigenvalues()[0]);
     double e2=real(solver.eigenvalues()[1]);
     double e3=real(solver.eigenvalues()[2]);
-    return Eigenvalues(energy(e1),energy(e2),energy(e3),Orientation(solver.eigenvectors().real()));
+    Eigenvalues ev = Eigenvalues(energy(e1),energy(e2),energy(e3),Orientation(solver.eigenvectors().real()));
+    return ev;
 }
 Eigenvalues SpinXML::ConvertToEigenvalues(const Eigenvalues& I) {return I;}
 Eigenvalues SpinXML::ConvertToEigenvalues(const AxRhom& I) {
@@ -69,16 +87,34 @@ AxRhom SpinXML::ConvertToAxRhom(const energy& I) {
 AxRhom SpinXML::ConvertToAxRhom(const Matrix3d& I) {return ConvertToAxRhom(ConvertToEigenvalues(I));}
 AxRhom SpinXML::ConvertToAxRhom(const Eigenvalues& I) {
     energy xx=I.xx; energy yy=I.yy; energy zz=I.zz;
+
+    Matrix3d o = I.mOrient.GetAsMatrix();
+
     //Sort so that xx <= yy <= zz
     energy tmp;
-	if(zz < yy) {tmp=zz; zz=yy; yy=tmp;}
-	if(zz < xx) {tmp=zz; zz=xx; xx=tmp;} //Now zz is definatly bigest
-	if(yy < xx) {tmp=xx; xx=yy; yy=tmp;}
+	if(zz < yy) {
+        o = MakeMatrix3d(o(0,0), o(0,1), o(0,2),
+                         o(1,0),-o(2,2),-o(2,1),
+                         o(2,0), o(1,2), o(1,1));
+        tmp=zz; zz=yy; yy=tmp;
+    }
+	if(zz < xx) {
+        o = MakeMatrix3d(-o(2,2), o(0,1),-o(2,0),
+                          o(1,0), o(1,1), o(1,2),
+                          o(0,2), o(2,1), o(0,0));
+        tmp=zz; zz=xx; xx=tmp;
+    } 
+	if(yy < xx) {//Now zz is definatly bigest
+        o = MakeMatrix3d(-o(1,1),-o(1,0), o(0,2),
+                          o(0,1), o(0,0), o(1,2),
+                          o(2,0), o(2,1), o(2,2));
+        tmp=xx; xx=yy; yy=tmp;
+    }
 
     energy iso = (xx+yy+zz)/3.0;
     energy ax=2*zz -  xx - yy;
     energy rh=xx - yy;
-    return AxRhom(iso,ax,rh,I.mOrient);
+    return AxRhom(iso,ax,rh,Orientation(o));
 }
 AxRhom SpinXML::ConvertToAxRhom(const AxRhom& I) {return I;}
 AxRhom SpinXML::ConvertToAxRhom(const SpanSkew& I) {return ConvertToAxRhom(ConvertToEigenvalues(I));}

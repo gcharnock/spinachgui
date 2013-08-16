@@ -86,7 +86,6 @@ EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Norma
 Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {
     //There are severnal methods to fixing up a rotaiton matrix, here
     //we will use a QR factorisation.
-
     Matrix3d Q;
     //Matrix3d R;
 
